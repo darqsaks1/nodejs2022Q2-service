@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './users/dto/create-user.dto';
-import { UpdateUserDto } from './users/dto/update-user.dto';
 import { v4 as uuidv4 } from 'uuid';
+import * as bcrypt from 'bcrypt';
 import { User } from './users/entities/user.entity';
+import { UpdatePasswordDto } from './users/dto/update-password.dto';
 @Injectable()
 export class UsersService {
-  private users: User[] = [];
-  private idSeq = 0;
-
+  public users: User[] = [];
   public async create(createUserDto: CreateUserDto): Promise<User> {
     this.users.push({
       ...createUserDto,
@@ -16,33 +15,61 @@ export class UsersService {
       updatedAt: + new Date(),
       id: uuidv4()
     });
-    return this.users.at(-1);
+    const cloned = this.users.map(o => ({ ...o }));
+    const clone = cloned.at(-1);
+    clone.password = bcrypt.hashSync(clone.password, 10)
+    console.log(cloned, this.users, 'THIS IS MY LOG')
+    return clone;
   }
 
   findAll(): User[] {
-    console.log(this.users)
-    return this.users;
+    const hashedUsers = []
+    this.users.forEach((item) => {
+      const user = {
+        ...item,
+        password: bcrypt.hashSync(item.password, 10)
+      };
+      hashedUsers.push(user)
+    })
+    return hashedUsers;
   }
 
-  findOne(id: number): User {
-    return this.users.find((user) => user.id);
+  findOne(id: string): User {
+    const cloned = this.users.map(o => ({ ...o }));
+    const finded = cloned.find((user) => user.id === id);
+    finded.password = bcrypt.hashSync(finded.password, 10)
+    return finded
   }
 
-  update(id: number, updateUserDto: UpdateUserDto): User {
-    const i = this.users.findIndex((user) => user.id);
+  findUpdate(id: string): User {
+
+    const user = this.users.find((user) => user.id === id);
+    return user
+  }
+
+  update(id: string, updatePasswordDto: UpdatePasswordDto): User {
+    const i = this.users.findIndex((user) => user.id === id);
     if (i === -1) return null;
     this.users[i] = {
       ...this.users[i],
-      ...updateUserDto,
+      password: updatePasswordDto.newPassword,
+      version: this.users[i].version += 1,
+      updatedAt: +new Date()
     };
-    return this.users[i];
+    const cloned = this.users.map(o => ({ ...o }));
+
+    const clone = Object.assign({}, cloned[i]);
+    clone.password = bcrypt.hashSync(clone.password, 10)
+    return clone;
   }
 
-  remove(id: number): User {
-    const i = this.users.findIndex((user) => user.id);
+  remove(id: string): User {
+    const i = this.users.findIndex((user) => user.id === id);
     if (i === -1) return null;
     const user = this.users[i];
     this.users.splice(i, 1);
-    return user;
+    const clone = Object.assign({}, user);
+    clone.password = bcrypt.hashSync(clone.password, 10)
+    return clone;
   }
 }
