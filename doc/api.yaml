@@ -5,7 +5,7 @@ info:
   version: 1.0.0
 
 servers:
-  - url: 
+  - url: /
 
 components:
   schemas:
@@ -92,15 +92,15 @@ components:
     Favorites:
       type: object
       properties:
-        artists:
+        artist:
           type: array
           items:
             $ref: '#/components/schemas/Artist'
-        albums:
+        album:
           type: array
           items:
             $ref: '#/components/schemas/Album'
-        tracks:
+        track:
           type: array
           items:
             $ref: '#/components/schemas/Track'
@@ -113,48 +113,48 @@ components:
       scheme: bearer
       bearerFormat: JWT
 
-# security:
+security:
   - bearerAuth: []
 
 paths:
-  # /login:
-  #   post:
-  #     tags:
-  #       - Login
-  #     security: []
-  #     summary: Login
-  #     description: Logins a user and returns a JWT-token
-  #     requestBody:
-  #       required: true
-  #       content:
-  #         application/json:
-  #           schema:
-  #             type: object
-  #             title: example
-  #             properties:
-  #               login:
-  #                 type: string
-  #                 description: Username
-  #               password:
-  #                 type: string
-  #                 description: Password
-  #             required:
-  #               - user
-  #               - login
-  #     responses:
-  #       200:
-  #         description: Successful login.
-  #         content:
-  #           application/json:
-  #             schema:
-  #               type: object
-  #               properties:
-  #                 token:
-  #                   type: string
-  #               description: JWT Token
-  #       403:
-  #         description: Incorrect login or password
-  # /signup:
+  /login:
+    post:
+      tags:
+        - Login
+      security: []
+      summary: Login
+      description: Logins a user and returns a JWT-token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              title: example
+              properties:
+                login:
+                  type: string
+                  description: Username
+                password:
+                  type: string
+                  description: Password
+              required:
+                - user
+                - login
+      responses:
+        200:
+          description: Successful login.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                description: JWT Token
+        403:
+          description: Incorrect login or password
+  /signup:
     post:
       tags:
         - Signup
@@ -192,7 +192,7 @@ paths:
   /user:
     get:
       tags:
-        - User
+        - user
       summary: Get all user
       description: Gets all user
       responses:
@@ -334,12 +334,12 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         404:
           description: User not found
-  /tracks:
+  /track:
     get:
       tags:
         - Track
-      summary: Get tracks list
-      description: Gets all library tracks list
+      summary: Get track list
+      description: Gets all library track list
       responses:
         200:
           description: Successful operation
@@ -388,7 +388,7 @@ paths:
           description: Bad request. body does not contain required fields
         401:
           $ref: '#/components/responses/UnauthorizedError'
-  /tracks/{id}:
+  /track/{id}:
     parameters:
       - name: id
         in: path
@@ -492,11 +492,11 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         404:
           description: Track was not found.
-  /albums:
+  /album:
     get:
       tags:
         - Album
-      summary: Get albums list
+      summary: Get album list
       description: Gets all library alibums list
       responses:
         200:
@@ -544,7 +544,7 @@ paths:
           description: Bad request. body does not contain required fields
         401:
           $ref: '#/components/responses/UnauthorizedError'
-  /albums/{id}:
+  /album/{id}:
     parameters:
       - name: id
         in: path
@@ -621,12 +621,12 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         404:
           description: Album was not found.
-  /artists:
+  /artist:
     get:
       tags:
         - Artist
-      summary: Get all artists
-      description: Gets all artists
+      summary: Get all artist
+      description: Gets all artist
       responses:
         200:
           description: Successful operation
@@ -668,7 +668,7 @@ paths:
           description: Bad request. body does not contain required fields
         401:
           $ref: '#/components/responses/UnauthorizedError'
-  /artists/{id}:
+  /artist/{id}:
     parameters:
       - name: id
         in: path
@@ -745,7 +745,7 @@ paths:
       tags:
         - Favorites
       summary: Get all favorites
-      description: Gets all favorites movies, tracks and books
+      description: Gets all favorites movies, track and books
       responses:
         200:
           description: Successful operation

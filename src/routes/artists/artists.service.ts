@@ -4,6 +4,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { Artist } from './artists/entities/artists.entity';
 import { UpdateArtistsDto } from './artists/dto/update-artist.dto';
 import { InMemoryStore } from '../../data/data';
+import { Track } from '../tracks/tracks/entities/track.entity';
+import { Album } from 'src/routes/albums/albums/entities/albums.entity';
 
 @Injectable()
 export class ArtistsService {
@@ -24,12 +26,12 @@ export class ArtistsService {
   }
 
   findOne(id: string): Artist {
-    const finded = this.inMemoryStore.artists.find((user) => user.id === id);
+    const finded: Artist = this.inMemoryStore.artists.find((user) => user.id === id);
     return finded
   }
 
   update(id: string, updateArtistsDto: UpdateArtistsDto): Artist {
-    const i = this.inMemoryStore.artists.findIndex((user) => user.id === id);
+    const i: number = this.inMemoryStore.artists.findIndex((user) => user.id === id);
     if (i === -1) return null;
     this.inMemoryStore.artists[i] = {
       ...this.inMemoryStore.artists[i],
@@ -40,10 +42,14 @@ export class ArtistsService {
   }
 
   remove(id: string): Artist {
-    const i = this.inMemoryStore.artists.findIndex((user) => user.id === id);
+    const i: number = this.inMemoryStore.artists.findIndex((user) => user.id === id);
     if (i === -1) return null;
-    const user = this.inMemoryStore.artists[i];
-    const clone = Object.assign({}, user);
+    const user: Artist = this.inMemoryStore.artists[i];
+    const findedInTracks: Track = this.inMemoryStore.tracks.find((track) => track.artistId === id);
+    findedInTracks.artistId = null
+    const findedInAlbums: Album = this.inMemoryStore.albums.find((album) => album.artistId === id);
+    findedInAlbums.artistId = null
+    const clone: Artist = Object.assign({}, user);
     this.inMemoryStore.artists.splice(i, 1);
     return clone;
   }
