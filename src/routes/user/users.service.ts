@@ -28,7 +28,7 @@ export class UsersService {
     this.inMemoryStore?.users.forEach((item) => {
       const user = {
         ...item,
-        password: bcrypt.hashSync(item.password, 10)
+        password: bcrypt.hashSync(item?.password, 10)
       };
       hashedUsers.push(user)
     })
@@ -38,7 +38,7 @@ export class UsersService {
   findOne(id: string): User {
     const cloned = this.inMemoryStore.users.map(o => ({ ...o }));
     const finded = cloned.find((user) => user.id === id);
-    finded.password = bcrypt.hashSync(finded.password, 10)
+    finded.password = bcrypt.hashSync(finded?.password, 10)
     return finded
   }
 
@@ -53,14 +53,14 @@ export class UsersService {
     if (i === -1) return null;
     this.inMemoryStore.users[i] = {
       ...this.inMemoryStore.users[i],
-      password: updatePasswordDto.newPassword,
+      password: updatePasswordDto?.newPassword,
       version: this.inMemoryStore.users[i].version += 1,
       updatedAt: +new Date()
     };
     const cloned = this.inMemoryStore.users.map(o => ({ ...o }));
 
     const clone = Object.assign({}, cloned[i]);
-    clone.password = bcrypt.hashSync(clone.password, 10)
+    clone.password = bcrypt.hashSync(clone?.password, 10)
     return clone;
   }
 
@@ -70,7 +70,7 @@ export class UsersService {
     const user = this.inMemoryStore.users[i];
     this.inMemoryStore.users.splice(i, 1);
     const clone = Object.assign({}, user);
-    clone.password = bcrypt.hashSync(clone.password, 10)
+    clone.password = bcrypt.hashSync(clone?.password, 10)
     return clone;
   }
 }

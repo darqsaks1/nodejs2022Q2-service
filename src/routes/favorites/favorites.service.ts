@@ -1,8 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateFavTrack } from './favorites/dto/favorites-track.dto';
-import { v4 as uuidv4 } from 'uuid';
-import { FavoritesRepsonse } from './favorites/entities/favorites.entity';
-import { UpdateTrackDto } from './favorites/dto/update-track.dto';
 import { InMemoryStore } from '../../data/data';
 
 @Injectable()
