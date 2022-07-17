@@ -6,8 +6,9 @@ import { UsersModule } from './routes/user/users.module';
 import { TrackModule } from './routes/tracks/tracks.module';
 import { ArtistModule } from './routes/artists/artists.module';
 import { AlbumsModule } from './routes/albums/albums.module';
+import { FavoritesModule } from './routes/favorites/favorites.module';
 @Module({
-  imports: [ConfigModule.forRoot(), UsersModule, TrackModule, AlbumsModule, ArtistModule],
+  imports: [ConfigModule.forRoot(), UsersModule, TrackModule, AlbumsModule, ArtistModule, FavoritesModule],
   controllers: [AppController],
   providers: [AppService],
 })

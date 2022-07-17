@@ -7,4 +7,4 @@ import { InMemoryStore } from '../../data/data';
   controllers: [FavoritesController],
   providers: [FavoritesService, InMemoryStore],
 })
-export class TrackModule { }
+export class FavoritesModule { }

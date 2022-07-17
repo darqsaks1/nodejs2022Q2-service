@@ -19,14 +19,13 @@ export class UsersService {
     });
     const cloned = this.inMemoryStore.users.map(o => ({ ...o }));
     const clone = cloned.at(-1);
-    clone.password = bcrypt.hashSync(clone.password, 10)
-    console.log(cloned, this.inMemoryStore.users, 'THIS IS MY LOG')
+    clone.password = bcrypt.hashSync(clone?.password, 10)
     return clone;
   }
 
   findAll(): User[] {
     const hashedUsers = []
-    this.inMemoryStore.users.forEach((item) => {
+    this.inMemoryStore?.users.forEach((item) => {
       const user = {
         ...item,
         password: bcrypt.hashSync(item.password, 10)
