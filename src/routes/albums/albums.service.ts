@@ -48,6 +48,8 @@ export class AlbumsService {
     if (i === -1) return null;
     const user = this.inMemoryStore.albums[i];
     const findedInTrack: Track = this.inMemoryStore.tracks.find((album) => album.albumId === id);
+    const indexOfFavs = this.inMemoryStore.favorites.albums.findIndex((album) => album.id === id);
+    indexOfFavs && this.inMemoryStore.favorites.albums.splice(indexOfFavs, 1);
     findedInTrack.albumId = null
     const clone = Object.assign({}, user);
     this.inMemoryStore.albums.splice(i, 1);

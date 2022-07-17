@@ -50,6 +50,8 @@ export class TracksService {
     const i = this.inMemoryStore.tracks.findIndex((user) => user.id === id);
     if (i === -1) return null;
     const user = this.inMemoryStore.tracks[i];
+    const indexOfFavs = this.inMemoryStore.favorites.tracks.findIndex((track) => track.id === id);
+    indexOfFavs && this.inMemoryStore.favorites.tracks.splice(indexOfFavs, 1);
     const clone = Object.assign({}, user);
     this.inMemoryStore.tracks.splice(i, 1);
     return clone;

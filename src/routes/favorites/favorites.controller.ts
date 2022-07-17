@@ -65,7 +65,7 @@ export class FavoritesController {
     // if (!this.favoritesService.findOne(id)) {
     //   throw new HttpException('Not found', HttpStatus.NOT_FOUND);
     // }
-    return this.favoritesService.removeFav(id, 'tracks');
+    return this.favoritesService.removeFav(id, 'albums');
   }
 
 

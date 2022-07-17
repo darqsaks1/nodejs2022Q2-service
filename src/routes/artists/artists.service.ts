@@ -42,13 +42,15 @@ export class ArtistsService {
   }
 
   remove(id: string): Artist {
-    const i: number = this.inMemoryStore.artists.findIndex((user) => user.id === id);
+    const i: number = this.inMemoryStore?.artists?.findIndex((user) => user?.id === id);
     if (i === -1) return null;
-    const user: Artist = this.inMemoryStore.artists[i];
-    const findedInTracks: Track = this.inMemoryStore.tracks.find((track) => track.artistId === id);
+    const user: Artist = this.inMemoryStore?.artists[i];
+    const findedInTracks: Track = this.inMemoryStore?.tracks?.find((track) => track?.artistId === id);
     findedInTracks.artistId = null
-    const findedInAlbums: Album = this.inMemoryStore.albums.find((album) => album.artistId === id);
+    const findedInAlbums: Album = this.inMemoryStore?.albums?.find((album) => album?.artistId === id);
     findedInAlbums.artistId = null
+    const indexOfFavs = this.inMemoryStore.favorites?.artists?.findIndex((artist) => artist?.id === id);
+    indexOfFavs && this.inMemoryStore?.favorites?.artists.splice(indexOfFavs, 1);
     const clone: Artist = Object.assign({}, user);
     this.inMemoryStore.artists.splice(i, 1);
     return clone;
