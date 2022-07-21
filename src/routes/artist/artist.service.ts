@@ -4,18 +4,18 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { AlbumService } from 'src/album/album.service';
-import { InMemoryDB } from 'src/db/InMemoryDB';
-import { FavoritesService } from 'src/favorites/favorites.service';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { TrackService } from 'src/track/track.service';
+import { AlbumService } from '../album/album.service';
+import { FullyData } from '../../data/fullyData';
+import { FavoritesService } from '../favorites/favorites.service';
+import { PrismaService } from '../prisma/prisma.service';
+import { TrackService } from '../track/track.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { Artist } from './entities/artist.entity';
 
 @Injectable()
 export class ArtistService {
-  private static db: InMemoryDB<Artist>;
+  private static db: FullyData;
 
   constructor(
     @Inject(forwardRef(() => AlbumService))
@@ -26,18 +26,18 @@ export class ArtistService {
     private favoritesService: FavoritesService,
     private prisma: PrismaService,
   ) {
-    ArtistService.db = new InMemoryDB<Artist>(Artist);
+    ArtistService.db = new FullyData(Artist);
   }
 
-  create(createArtistDto: CreateArtistDto) {
+  createArtist(createArtistDto: CreateArtistDto) {
     return this.prisma.artist.create({ data: createArtistDto });
   }
 
-  findAll() {
+  findAllArtist() {
     return this.prisma.artist.findMany();
   }
 
-  async findOne(id: string) {
+  async findOneArtist(id: string) {
     const artist = await this.prisma.artist.findFirst({ where: { id } });
 
     if (!artist)
@@ -50,27 +50,30 @@ export class ArtistService {
     return artist;
   }
 
-  async update(id: string, updateArtistDto: UpdateArtistDto) {
+  async updateArtist(id: string, updateArtistDto: UpdateArtistDto) {
     return this.prisma.artist.update({
       where: { id },
-      data: { ...updateArtistDto },
+      data: {
+        name: updateArtistDto.name,
+        grammy: updateArtistDto.grammy
+      },
     });
   }
 
-  async remove(id: string) {
-    const albums = await this.albumService.findAll();
-    const tracks = await this.trackService.findAll();
+  async removeArtist(id: string) {
+    const albums = await this.albumService.findAllAlbum();
+    const tracks = await this.trackService.findAllTrack();
 
     for (const album of albums) {
       if (album.artistId !== id) continue;
 
-      this.albumService.update(album.id, { ...album, artistId: null });
+      this.albumService.updateAlbum(album.id, { ...album, artistId: null });
     }
 
     for (const track of tracks) {
       if (track.artistId !== id) continue;
 
-      this.trackService.update(track.id, { ...track, artistId: null });
+      this.trackService.updateTrack(track.id, { ...track, artistId: null });
     }
 
     this.favoritesService.removeArtistToFavourites(id);

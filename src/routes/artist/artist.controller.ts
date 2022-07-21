@@ -5,6 +5,8 @@ import {
   Body,
   Param,
   Delete,
+  HttpException,
+  HttpStatus,
   ParseUUIDPipe,
   HttpCode,
   Put,
@@ -15,22 +17,22 @@ import { UpdateArtistDto } from './dto/update-artist.dto';
 
 @Controller('artist')
 export class ArtistController {
-  constructor(private readonly artistService: ArtistService) {}
+  constructor(private readonly artistService: ArtistService) { }
 
   @Post()
   @HttpCode(201)
   create(@Body() createArtistDto: CreateArtistDto) {
-    return this.artistService.create(createArtistDto);
+    return this.artistService.createArtist(createArtistDto);
   }
 
   @Get()
   findAll() {
-    return this.artistService.findAll();
+    return this.artistService.findAllArtist();
   }
 
   @Get(':id')
   async findOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    return this.artistService.findOne(id);
+    return this.artistService.findOneArtist(id);
   }
 
   @Put(':id')
@@ -38,14 +40,23 @@ export class ArtistController {
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() updateArtistDto: UpdateArtistDto,
   ) {
-    await this.findOne(id);
-    return this.artistService.update(id, updateArtistDto);
+    const artist = await this.findOne(id);
+    console.log(updateArtistDto)
+    if (!artist) {
+      throw new HttpException(
+        'with this ID does not exist',
+        HttpStatus.NOT_FOUND,
+      );
+    } else {
+      return this.artistService.updateArtist(id, updateArtistDto);
+    }
+
   }
 
   @Delete(':id')
   @HttpCode(204)
   async remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     await this.findOne(id);
-    return this.artistService.remove(id);
+    return this.artistService.removeArtist(id);
   }
 }

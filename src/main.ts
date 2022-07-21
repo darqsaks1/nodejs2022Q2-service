@@ -8,8 +8,6 @@ import { resolve } from 'path';
 import { cwd } from 'process';
 import { parse } from 'yaml';
 
-
-
 async function initProject() {
   dotenv.config({ path: resolve(cwd(), '.env') });
   const PORT_ENV = process.env.PORT || 4000;

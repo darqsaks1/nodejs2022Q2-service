@@ -5,6 +5,8 @@ import {
   Body,
   Param,
   Delete,
+  HttpException,
+  HttpStatus,
   Put,
   ParseUUIDPipe,
   HttpCode,
@@ -15,22 +17,21 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
+  @Get()
+  findAll() {
+    return this.userService.findAllUser();
+  }
   @Post()
   @HttpCode(201)
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
 
-  @Get()
-  findAll() {
-    return this.userService.findAll();
-  }
-
   @Get(':id')
   async findOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    return this.userService.findOne(id);
+    return this.userService.findOneUser(id);
   }
 
   @Put(':id')
@@ -39,13 +40,20 @@ export class UserController {
     @Body() updateUserDto: UpdateUserDto,
   ) {
     await this.findOne(id);
-    return this.userService.update(id, updateUserDto);
+    return this.userService.updateUser(id, updateUserDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
   async remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    await this.findOne(id);
-    return this.userService.remove(id);
+    const user = await this.findOne(id);
+    if (!user) {
+      throw new HttpException(
+        'with this ID does not exist',
+        HttpStatus.NOT_FOUND,
+      );
+    } else {
+      return this.userService.removeUser(id);
+    }
   }
 }

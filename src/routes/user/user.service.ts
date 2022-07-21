@@ -12,12 +12,8 @@ import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
-  private db: FullyData<User>;
-
   constructor(private prisma: PrismaService) {
-    this.db = new FullyData<User>(User);
   }
-
   async create(createUserDto: CreateUserDto) {
     const user = await this.prisma.user.create({
       data: createUserDto,
@@ -26,12 +22,12 @@ export class UserService {
     return plainToInstance(User, user);
   }
 
-  async findAll() {
+  async findAllUser() {
     const users = await this.prisma.user.findMany();
     return users.map((user) => plainToInstance(User, user));
   }
 
-  async findOne(id: string) {
+  async findOneUser(id: string) {
     const user = await this.prisma.user.findFirst({ where: { id } });
 
     if (!user)
@@ -44,7 +40,7 @@ export class UserService {
     return plainToInstance(User, user);
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
+  async updateUser(id: string, updateUserDto: UpdateUserDto) {
     const user = await this.prisma.user.findFirst({ where: { id } });
 
     if (updateUserDto.oldPassword !== user.password)
@@ -66,7 +62,7 @@ export class UserService {
     );
   }
 
-  async remove(id: string) {
+  async removeUser(id: string) {
     return this.prisma.user.delete({ where: { id } });
   }
 }

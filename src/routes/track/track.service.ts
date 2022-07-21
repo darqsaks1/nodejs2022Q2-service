@@ -13,25 +13,25 @@ import { Track } from './entities/track.entity';
 
 @Injectable()
 export class TrackService {
-  private static db: FullyData<Track>;
+  private static db: FullyData;
 
   constructor(
     @Inject(forwardRef(() => FavoritesService))
     private favoritesService: FavoritesService,
     private prisma: PrismaService,
   ) {
-    TrackService.db = new FullyData<Track>(Track);
+    TrackService.db = new FullyData(Track);
   }
 
-  async create(createTrackDto: CreateTrackDto) {
+  async createTrack(createTrackDto: CreateTrackDto) {
     return this.prisma.track.create({ data: createTrackDto });
   }
 
-  async findAll() {
+  async findAllTrack() {
     return this.prisma.track.findMany();
   }
 
-  async findOne(id: string) {
+  async findOneTrack(id: string) {
     const track = await this.prisma.track.findFirst({ where: { id } });
 
     if (!track)
@@ -44,7 +44,7 @@ export class TrackService {
     return track;
   }
 
-  async update(id: string, updateTrackDto: UpdateTrackDto) {
+  async updateTrack(id: string, updateTrackDto: UpdateTrackDto) {
     return this.prisma.track.update({
       where: { id },
       data: { ...updateTrackDto },

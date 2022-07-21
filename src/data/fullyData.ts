@@ -1,33 +1,31 @@
-interface InMemoryDBEntity {
-  id?: string;
-}
 
-export class  FullyData<T extends InMemoryDBEntity> {
-  private db: T[] = [];
-  private entity: new (data: T) => T;
 
-  constructor(entity: { new (data: T): T }) {
+export class FullyData {
+  private dataBase = [];
+  private entity: new (data) => any;
+
+  constructor(entity: { new(data): any }) {
     this.entity = entity;
   }
 
-  async create(data: T): Promise<T> {
+  async create(data) {
     return new Promise((resolver) => {
       const newData = new this.entity(data);
-      this.db.push(newData);
+      this.dataBase.push(newData);
 
       resolver(newData);
     });
   }
 
-  async findAll(): Promise<T[]> {
+  async findAll() {
     return new Promise((resolver) => {
-      resolver(this.db.map((data: T) => data));
+      resolver(this.dataBase.map((data) => data));
     });
   }
 
-  async findOne(id: string): Promise<T | undefined> {
+  async findOne(id: string) {
     return new Promise(async (resolver) => {
-      const foundData = this.db.find((data: T) => data.id === id);
+      const foundData = this.dataBase.find((data) => data.id === id);
 
       if (!foundData) resolver(undefined);
 
@@ -35,18 +33,18 @@ export class  FullyData<T extends InMemoryDBEntity> {
     });
   }
 
-  async update(id: string, rawData: T): Promise<T> {
+  async update(id: string, rawData) {
     return new Promise(async (resolver) => {
       const newData = new this.entity(rawData);
-      this.db = this.db.map((data: T) => (data.id === id ? newData : data));
+      this.dataBase = this.dataBase.map((data) => (data.id === id ? newData : data));
 
       resolver(newData);
     });
   }
 
-  async remove(id: string): Promise<true> {
+  async remove(id: string) {
     return new Promise(async (resolver) => {
-      this.db = this.db.filter((data: T) => data.id !== id);
+      this.dataBase = this.dataBase.filter((data) => data.id !== id);
       resolver(true);
     });
   }

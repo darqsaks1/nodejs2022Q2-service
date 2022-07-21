@@ -21,17 +21,17 @@ export class TrackController {
   @Post()
   @HttpCode(201)
   create(@Body() createTrackDto: CreateTrackDto) {
-    return this.trackService.create(createTrackDto);
+    return this.trackService.createTrack(createTrackDto);
   }
 
   @Get()
   findAll() {
-    return this.trackService.findAll();
+    return this.trackService.findAllTrack();
   }
 
   @Get(':id')
   async findOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    return this.trackService.findOne(id);
+    return this.trackService.findOneTrack(id);
   }
 
   @Put(':id')
@@ -40,7 +40,7 @@ export class TrackController {
     @Body() updateTrackDto: UpdateTrackDto,
   ) {
     await this.findOne(id);
-    return this.trackService.update(id, updateTrackDto);
+    return this.trackService.updateTrack(id, updateTrackDto);
   }
 
   @Delete(':id')
