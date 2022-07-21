@@ -21,8 +21,8 @@ export class UsersController {
 
   @ApiResponse({ status: 200, description: 'Server should answer with status code 200 and all users records' })
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  async findAll() {
+    return await this.usersService.findAll();
   }
 
   @ApiResponse({ status: 200, description: 'Server should answer with status code 200 and and record with id === userId if it exists' })

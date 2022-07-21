@@ -19,6 +19,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)))
   const port = process.env.PORT;
   const rootDirname = dirname(__dirname);
+  console.log(rootDirname)
   const DOC_API = await readFileSync(join(rootDirname, 'doc', 'api.yaml'), 'utf-8');
   const data = parse(DOC_API);
   SwaggerModule.setup('doc', app, data);

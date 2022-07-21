@@ -14,3 +14,27 @@ export class User implements IUser {
   createdAt: number; // timestamp of creation
   updatedAt: number; // timestamp of last update
 }
+
+
+// @Entity()
+// export class User {
+
+//   @PrimaryGeneratedColumn("uuid")
+//   id: string;
+
+//   @Column()
+//   login: string;
+
+//   @Column()
+//   password: string;
+
+//   @VersionColumn()
+//   version: number;
+
+//   @CreateDateColumn()
+//   createdAt: string;
+
+//   @UpdateDateColumn()
+//   updatedAt: string;
+
+// }; 

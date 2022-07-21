@@ -5,6 +5,8 @@ import * as bcrypt from 'bcrypt';
 import { InMemoryStore } from '../../data/data';
 import { User } from './users/entities/user.entity';
 import { UpdatePasswordDto } from './users/dto/update-password.dto';
+import { AppDataSource } from 'src/typeorm/data-source';
+
 @Injectable()
 export class UsersService {
   constructor(private inMemoryStore: InMemoryStore) { }
@@ -23,7 +25,7 @@ export class UsersService {
     return clone;
   }
 
-  findAll(): User[] {
+  async findAll() {
     const hashedUsers = []
     this.inMemoryStore?.users.forEach((item) => {
       const user = {
