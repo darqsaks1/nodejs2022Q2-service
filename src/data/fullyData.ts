@@ -2,7 +2,7 @@ interface InMemoryDBEntity {
   id?: string;
 }
 
-export class InMemoryDB<T extends InMemoryDBEntity> {
+export class  FullyData<T extends InMemoryDBEntity> {
   private db: T[] = [];
   private entity: new (data: T) => T;
 

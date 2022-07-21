@@ -3,15 +3,15 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './routes/user/user.module';
 import { PrismaModule } from './routes/prisma/prisma.module';
+import { TrackModule } from './routes/track/track.module';
 
 import { ArtistModule } from './artist/artist.module';
 import { AlbumModule } from './album/album.module';
-import { TrackModule } from './track/track.module';
 import { FavoritesModule } from './favorites/favorites.module';
 
 @Module({
   imports: [
-    UserModule, 
+    UserModule,
     PrismaModule,
     ArtistModule,
     AlbumModule,

@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
-import { InMemoryDB } from '../../data/InMemoryDB';
+import { FullyData } from '../../data/fullyData';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -12,10 +12,10 @@ import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
-  private db: InMemoryDB<User>;
+  private db: FullyData<User>;
 
   constructor(private prisma: PrismaService) {
-    this.db = new InMemoryDB<User>(User);
+    this.db = new FullyData<User>(User);
   }
 
   async create(createUserDto: CreateUserDto) {
