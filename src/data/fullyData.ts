@@ -1,48 +1,31 @@
-
-
 export class FullyData {
-  private dataBase = [];
-  private entity: new (data) => any;
-
-  constructor(entity: { new(data): any }) {
-    this.entity = entity;
+  public dataBase = [];
+  public data: new (data) => any;
+  constructor(newData: { new(data): any }) {
+    this.data = newData;
   }
-
-  async create(data) {
-    return new Promise((resolver) => {
-      const newData = new this.entity(data);
-      this.dataBase.push(newData);
-
-      resolver(newData);
+  async findOneItem(id: string) {
+    return new Promise(async (resolver) => {
+      resolver(this.dataBase.find((data) => data.id === id));
     });
-  }
-
-  async findAll() {
+  } async findAllItems() {
     return new Promise((resolver) => {
       resolver(this.dataBase.map((data) => data));
     });
   }
-
-  async findOne(id: string) {
-    return new Promise(async (resolver) => {
-      const foundData = this.dataBase.find((data) => data.id === id);
-
-      if (!foundData) resolver(undefined);
-
-      resolver(foundData);
+  async createNewItem(x: any) {
+    return new Promise((resolver) => {
+      this.dataBase.push(new this.data(x));
+      resolver(new this.data(x));
     });
   }
-
-  async update(id: string, rawData) {
+  async updateItems(id: string, dataSelected: any) {
     return new Promise(async (resolver) => {
-      const newData = new this.entity(rawData);
-      this.dataBase = this.dataBase.map((data) => (data.id === id ? newData : data));
-
-      resolver(newData);
+      this.dataBase = this.dataBase.map((data) => (data.id === id ? new this.data(dataSelected) : data));
+      resolver(new this.data(dataSelected));
     });
   }
-
-  async remove(id: string) {
+  async removeItems(id: string) {
     return new Promise(async (resolver) => {
       this.dataBase = this.dataBase.filter((data) => data.id !== id);
       resolver(true);

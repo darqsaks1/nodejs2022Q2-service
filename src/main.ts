@@ -11,7 +11,7 @@ import { parse } from 'yaml';
 async function start() {
   dotenv.config({ path: resolve(cwd(), '.env') });
   const PORT_ENV = process.env.PORT || 4000;
-  const doc = await readFile(resolve(cwd(), 'doc', 'api.yaml'), {
+  const APP_DOC = await readFile(resolve(cwd(), 'doc', 'api.yaml'), {
     encoding: 'utf8',
   });
   const app = await NestFactory.create(AppModule);
@@ -20,8 +20,7 @@ async function start() {
     .useGlobalPipes(
       new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
     );
-
-  SwaggerModule.setup('doc', app, parse(doc));
+  SwaggerModule.setup('doc', app, parse(APP_DOC));
   await app.listen(PORT_ENV);
 }
 start();

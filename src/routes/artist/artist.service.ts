@@ -44,7 +44,7 @@ export class ArtistService {
       },
     });
   }
-  
+
   createArtist(createArtistDto: CreateArtistDto) {
     return this.prisma.artist.create({ data: createArtistDto });
   }
@@ -66,7 +66,7 @@ export class ArtistService {
         this.albumService.updateAlbum(element.id, { ...element, artistId: null });
       }
     });
-    this.favoritesService.favRemoveArtist(id);
+    this.favoritesService.favRemove(id, 'artists');
     return this.prisma.artist.delete({ where: { id } });
   }
 }

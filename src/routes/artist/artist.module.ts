@@ -9,11 +9,11 @@ import { PrismaService } from '../../prismaService/prisma.service';
 @Module({
   controllers: [ArtistController],
   providers: [
+    FavoritesService,
+    PrismaService,
     ArtistService,
     AlbumService,
     TrackService,
-    FavoritesService,
-    PrismaService,
   ],
 })
-export class ArtistModule {}
+export class ArtistModule { }

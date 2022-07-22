@@ -9,6 +9,7 @@ import { ArtistService } from '../artist/artist.service';
 import { PrismaService } from '../../prismaService/prisma.service';
 import { TrackService } from '../track/track.service';
 import { Favorite } from './entities/favorite.entity';
+import { ADDED, HTTP_CODES } from 'src/utils';
 
 @Injectable()
 export class FavoritesService {
@@ -26,44 +27,33 @@ export class FavoritesService {
     @Inject(forwardRef(() => TrackService))
     private trackService: TrackService,
     private prisma: PrismaService,
-  ) {}
-
-  async favAddArtist(id: string) {
-    const artist = await this.prisma.artist.findFirst({ where: { id } });
-    if (!artist) throw new UnprocessableEntityException();
-
-    console.log(await this.prisma.favorite.findMany());
-    return { statusCode: 201, message: 'Added successfully' };
-  }
-
-  favRemoveArtist(id: string) {
-    return FavoritesService.data.artists.delete(id);
-  }
+  ) { }
 
   async favAddAlbum(id: string) {
-    const album = await this.albumService.findOneAlbum(id);
-
-    if (!album) throw new UnprocessableEntityException();
-
+    const finded = await this.albumService.findOneAlbum(id);
+    if (!finded) { 
+      throw new UnprocessableEntityException() 
+    };
     FavoritesService.data.albums.add(id);
-    return { statusCode: 201, message: 'Added successfully' };
+    return { statusCode: HTTP_CODES.SUCSESS, message: ADDED };
   }
-
-  favRemoveAlbum(id: string) {
-    return FavoritesService.data.albums.delete(id);
+  async favAddArtist(id: string) {
+    const finded = await this.prisma.artist.findFirst({ where: { id } });
+    if (!finded) {
+      throw new UnprocessableEntityException();
+    }
+    return { statusCode: HTTP_CODES.SUCSESS, message: ADDED };
   }
-
   async favAddTrack(id: string) {
-    const track = await this.trackService.findOneTrack(id);
-
-    if (!track) throw new UnprocessableEntityException();
-
+    const finded = await this.trackService.findOneTrack(id);
+    if (!finded) {
+      throw new UnprocessableEntityException();
+    }
     FavoritesService.data.tracks.add(id);
-    return { statusCode: 201, message: 'Added successfully' };
+    return { statusCode: HTTP_CODES.SUCSESS, message: ADDED };
   }
-
-  favRemoveTrack(id: string) {
-    return FavoritesService.data.tracks.delete(id);
+  favRemove(id: string, service) {
+    return FavoritesService.data[service].delete(id);
   }
 
   async FavfindServcies() {

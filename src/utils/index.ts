@@ -35,7 +35,10 @@ export const HTTP_ANSWERS = {
 
 export const HTTP_CODES = {
     NOT_FOUND: 404,
-    FORBIDDEN: 403
+    FORBIDDEN: 403,
+    SUCSESS: 201
 }
 
 export const NOT_EXIST = 'ID does not exist'
+
+export const ADDED = 'Added'

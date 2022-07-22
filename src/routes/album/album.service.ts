@@ -5,13 +5,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { isNull } from 'lodash';
-import { FullyData } from '../../data/fullyData';
 import { FavoritesService } from '../favorites/favorites.service';
 import { PrismaService } from '../../prismaService/prisma.service';
 import { TrackService } from '../track/track.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
-import { Album } from './entities/album.entity';
 import { HTTP_ANSWERS, HTTP_CODES } from 'src/utils';
 
 @Injectable()
@@ -22,14 +20,17 @@ export class AlbumService {
     @Inject(forwardRef(() => TrackService))
     private trackService: TrackService,
     private prisma: PrismaService,
-  ) {}
+  ) { }
 
   async findAllAlbum() {
     return this.prisma.album.findMany();
   }
 
   async findOneAlbum(id: string) {
-    const finded = await this.prisma.album.findFirst({ where: { id } });
+    const finded = await this.prisma.album.findFirst({
+      where: { id },
+      select: { artist: true },
+    });
     if (!finded)
       throw new NotFoundException({
         statusCode: HTTP_CODES.NOT_FOUND,
@@ -62,7 +63,7 @@ export class AlbumService {
         this.trackService.updateTrack(item.id, { ...item, albumId: null });
       }
     })
-    this.favoritesService.favRemoveAlbum(id);
+    this.favoritesService.favRemove(id, 'albums');
     return this.prisma.album.delete({ where: { id } });
   }
 }

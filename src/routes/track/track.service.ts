@@ -4,12 +4,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { FullyData } from '../../data/fullyData';
 import { FavoritesService } from '../favorites/favorites.service';
 import { PrismaService } from '../../prismaService/prisma.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { Track } from './entities/track.entity';
 import { HTTP_ANSWERS, HTTP_CODES } from 'src/utils';
 
 @Injectable()
@@ -48,7 +46,7 @@ export class TrackService {
   }
 
   async removeTrack(id: string) {
-    this.favoritesService.favRemoveTrack(id);
+    this.favoritesService.favRemove(id, 'tracks');
     return this.prisma.track.delete({ where: { id } });
   }
 }
