@@ -14,6 +14,7 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { NOT_EXIST } from '../../utils/index';
 
 @Controller('user')
 export class UserController {
@@ -46,10 +47,10 @@ export class UserController {
   @Delete(':id')
   @HttpCode(204)
   async remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    const user = await this.findOne(id);
-    if (!user) {
+    const finded = await this.findOne(id);
+    if (!finded) {
       throw new HttpException(
-        'with this ID does not exist',
+        NOT_EXIST,
         HttpStatus.NOT_FOUND,
       );
     } else {

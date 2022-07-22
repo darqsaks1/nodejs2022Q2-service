@@ -4,7 +4,7 @@ import { ArtistController } from './artist.controller';
 import { AlbumService } from '../album/album.service';
 import { TrackService } from '../track/track.service';
 import { FavoritesService } from '../favorites/favorites.service';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../prismaService/prisma.service';
 
 @Module({
   controllers: [ArtistController],

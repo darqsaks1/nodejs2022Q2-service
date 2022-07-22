@@ -11,22 +11,10 @@ import { FavoritesService } from './favorites.service';
 
 @Controller('favs')
 export class FavoritesController {
-  constructor(private readonly favoritesService: FavoritesService) {}
-
-  @Post('artist/:id')
-  @HttpCode(201)
-  addArtistToFavourites(
-    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
-  ) {
-    return this.favoritesService.addArtistToFavourites(id);
-  }
-
-  @Delete('artist/:id')
-  @HttpCode(204)
-  removeArtistToFavourites(
-    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
-  ) {
-    return this.favoritesService.removeArtistToFavourites(id);
+  constructor(private readonly favoritesService: FavoritesService) { }
+  @Get()
+  findAll() {
+    return this.favoritesService.FavfindServcies();
   }
 
   @Post('album/:id')
@@ -34,7 +22,7 @@ export class FavoritesController {
   addAlbumToFavourites(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
   ) {
-    return this.favoritesService.addAlbumToFavourites(id);
+    return this.favoritesService.favAddAlbum(id);
   }
 
   @Delete('album/:id')
@@ -42,7 +30,7 @@ export class FavoritesController {
   removeAlbumToFavourites(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
   ) {
-    return this.favoritesService.removeAlbumToFavourites(id);
+    return this.favoritesService.favRemoveAlbum(id);
   }
 
   @Post('track/:id')
@@ -50,7 +38,7 @@ export class FavoritesController {
   addTrackToFavourites(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
   ) {
-    return this.favoritesService.addTrackToFavourites(id);
+    return this.favoritesService.favAddTrack(id);
   }
 
   @Delete('track/:id')
@@ -58,11 +46,22 @@ export class FavoritesController {
   removeTrackToFavourites(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
   ) {
-    return this.favoritesService.removeTrackToFavourites(id);
+    return this.favoritesService.favRemoveTrack(id);
+  }
+  @Post('artist/:id')
+  @HttpCode(201)
+  addArtistToFavourites(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+  ) {
+    return this.favoritesService.favAddArtist(id);
   }
 
-  @Get()
-  findAll() {
-    return this.favoritesService.findAll();
+  @Delete('artist/:id')
+  @HttpCode(204)
+  removeArtistToFavourites(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+  ) {
+    return this.favoritesService.favRemoveArtist(id);
   }
+
 }

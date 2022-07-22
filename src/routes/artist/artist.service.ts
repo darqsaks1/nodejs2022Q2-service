@@ -5,18 +5,15 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { AlbumService } from '../album/album.service';
-import { FullyData } from '../../data/fullyData';
 import { FavoritesService } from '../favorites/favorites.service';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../prismaService/prisma.service';
 import { TrackService } from '../track/track.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
-import { Artist } from './entities/artist.entity';
+import { HTTP_ANSWERS, HTTP_CODES } from 'src/utils';
 
 @Injectable()
 export class ArtistService {
-  private static db: FullyData;
-
   constructor(
     @Inject(forwardRef(() => AlbumService))
     private albumService: AlbumService,
@@ -25,29 +22,17 @@ export class ArtistService {
     @Inject(forwardRef(() => FavoritesService))
     private favoritesService: FavoritesService,
     private prisma: PrismaService,
-  ) {
-    ArtistService.db = new FullyData(Artist);
-  }
-
-  createArtist(createArtistDto: CreateArtistDto) {
-    return this.prisma.artist.create({ data: createArtistDto });
-  }
-
-  findAllArtist() {
-    return this.prisma.artist.findMany();
-  }
+  ) { }
 
   async findOneArtist(id: string) {
-    const artist = await this.prisma.artist.findFirst({ where: { id } });
-
-    if (!artist)
+    const finded = await this.prisma.artist.findFirst({ where: { id } });
+    if (!finded)
       throw new NotFoundException({
-        statusCode: 404,
-        message: `Artist with this ID was not found`,
-        error: 'Not Found',
+        statusCode: HTTP_CODES.NOT_FOUND,
+        message: HTTP_ANSWERS.BAD_RESPONSE.ARTIST.FIND.message,
+        error: HTTP_ANSWERS.BAD_RESPONSE.ARTIST.FIND.error,
       });
-
-    return artist;
+    return finded;
   }
 
   async updateArtist(id: string, updateArtistDto: UpdateArtistDto) {
@@ -59,24 +44,29 @@ export class ArtistService {
       },
     });
   }
+  
+  createArtist(createArtistDto: CreateArtistDto) {
+    return this.prisma.artist.create({ data: createArtistDto });
+  }
+
+  findAllArtist() {
+    return this.prisma.artist.findMany();
+  }
 
   async removeArtist(id: string) {
-    const albums = await this.albumService.findAllAlbum();
-    const tracks = await this.trackService.findAllTrack();
-
-    for (const album of albums) {
-      if (album.artistId !== id) continue;
-
-      this.albumService.updateAlbum(album.id, { ...album, artistId: null });
-    }
-
-    for (const track of tracks) {
-      if (track.artistId !== id) continue;
-
-      this.trackService.updateTrack(track.id, { ...track, artistId: null });
-    }
-
-    this.favoritesService.removeArtistToFavourites(id);
+    const findedAlbums = await this.albumService.findAllAlbum();
+    const findedTracks = await this.trackService.findAllTrack();
+    findedTracks.forEach(element => {
+      if (element.id === id) {
+        this.trackService.updateTrack(element.id, { ...element, artistId: null });
+      }
+    });
+    findedAlbums.forEach(element => {
+      if (element.id === id) {
+        this.albumService.updateAlbum(element.id, { ...element, artistId: null });
+      }
+    });
+    this.favoritesService.favRemoveArtist(id);
     return this.prisma.artist.delete({ where: { id } });
   }
 }

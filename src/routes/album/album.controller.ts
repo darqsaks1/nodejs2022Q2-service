@@ -15,14 +15,7 @@ import { UpdateAlbumDto } from './dto/update-album.dto';
 
 @Controller('album')
 export class AlbumController {
-  constructor(private readonly albumService: AlbumService) {}
-
-  @Post()
-  @HttpCode(201)
-  async create(@Body() createAlbumDto: CreateAlbumDto) {
-    return this.albumService.createAlbum(createAlbumDto);
-  }
-
+  constructor(private readonly albumService: AlbumService) { }
   @Get()
   async findAll() {
     return this.albumService.findAllAlbum();
@@ -31,6 +24,12 @@ export class AlbumController {
   @Get(':id')
   async findOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     return this.albumService.findOneAlbum(id);
+  }
+
+  @Post()
+  @HttpCode(201)
+  async create(@Body() createAlbumDto: CreateAlbumDto) {
+    return this.albumService.createAlbum(createAlbumDto);
   }
 
   @Put(':id')

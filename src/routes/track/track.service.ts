@@ -6,23 +6,19 @@ import {
 } from '@nestjs/common';
 import { FullyData } from '../../data/fullyData';
 import { FavoritesService } from '../favorites/favorites.service';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../prismaService/prisma.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { Track } from './entities/track.entity';
+import { HTTP_ANSWERS, HTTP_CODES } from 'src/utils';
 
 @Injectable()
 export class TrackService {
-  private static db: FullyData;
-
   constructor(
     @Inject(forwardRef(() => FavoritesService))
     private favoritesService: FavoritesService,
     private prisma: PrismaService,
-  ) {
-    TrackService.db = new FullyData(Track);
-  }
-
+  ) { }
   async createTrack(createTrackDto: CreateTrackDto) {
     return this.prisma.track.create({ data: createTrackDto });
   }
@@ -36,9 +32,9 @@ export class TrackService {
 
     if (!track)
       throw new NotFoundException({
-        statusCode: 404,
-        message: `Track with this ID was not found`,
-        error: 'Not Found',
+        statusCode: HTTP_CODES.NOT_FOUND,
+        message: HTTP_ANSWERS.BAD_RESPONSE.TRACK.FIND.message,
+        error: HTTP_ANSWERS.BAD_RESPONSE.TRACK.FIND.error,
       });
 
     return track;
@@ -51,8 +47,8 @@ export class TrackService {
     });
   }
 
-  async remove(id: string) {
-    this.favoritesService.removeTrackToFavourites(id);
+  async removeTrack(id: string) {
+    this.favoritesService.favRemoveTrack(id);
     return this.prisma.track.delete({ where: { id } });
   }
 }

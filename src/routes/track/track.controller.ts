@@ -16,13 +16,7 @@ import { UpdateTrackDto } from './dto/update-track.dto';
 
 @Controller('track')
 export class TrackController {
-  constructor(private readonly trackService: TrackService) {}
-
-  @Post()
-  @HttpCode(201)
-  create(@Body() createTrackDto: CreateTrackDto) {
-    return this.trackService.createTrack(createTrackDto);
-  }
+  constructor(private readonly trackService: TrackService) { }
 
   @Get()
   findAll() {
@@ -32,6 +26,12 @@ export class TrackController {
   @Get(':id')
   async findOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     return this.trackService.findOneTrack(id);
+  }
+
+  @Post()
+  @HttpCode(201)
+  create(@Body() createTrackDto: CreateTrackDto) {
+    return this.trackService.createTrack(createTrackDto);
   }
 
   @Put(':id')
@@ -47,6 +47,6 @@ export class TrackController {
   @HttpCode(204)
   async remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     await this.findOne(id);
-    return this.trackService.remove(id);
+    return this.trackService.removeTrack(id);
   }
 }

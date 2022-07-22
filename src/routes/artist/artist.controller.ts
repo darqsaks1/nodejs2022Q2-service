@@ -14,6 +14,7 @@ import {
 import { ArtistService } from './artist.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
+import { NOT_EXIST } from '../../utils/index';
 
 @Controller('artist')
 export class ArtistController {
@@ -41,16 +42,14 @@ export class ArtistController {
     @Body() updateArtistDto: UpdateArtistDto,
   ) {
     const artist = await this.findOne(id);
-    console.log(updateArtistDto)
     if (!artist) {
       throw new HttpException(
-        'with this ID does not exist',
+        NOT_EXIST,
         HttpStatus.NOT_FOUND,
       );
     } else {
       return this.artistService.updateArtist(id, updateArtistDto);
     }
-
   }
 
   @Delete(':id')

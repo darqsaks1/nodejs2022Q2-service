@@ -8,7 +8,7 @@ import { resolve } from 'path';
 import { cwd } from 'process';
 import { parse } from 'yaml';
 
-async function initProject() {
+async function start() {
   dotenv.config({ path: resolve(cwd(), '.env') });
   const PORT_ENV = process.env.PORT || 4000;
   const doc = await readFile(resolve(cwd(), 'doc', 'api.yaml'), {
@@ -24,4 +24,4 @@ async function initProject() {
   SwaggerModule.setup('doc', app, parse(doc));
   await app.listen(PORT_ENV);
 }
-initProject();
+start();

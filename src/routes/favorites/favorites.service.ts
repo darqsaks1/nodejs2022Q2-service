@@ -6,13 +6,13 @@ import {
 } from '@nestjs/common';
 import { AlbumService } from '../album/album.service';
 import { ArtistService } from '../artist/artist.service';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../prismaService/prisma.service';
 import { TrackService } from '../track/track.service';
 import { Favorite } from './entities/favorite.entity';
 
 @Injectable()
 export class FavoritesService {
-  private static db: Favorite = {
+  private static data: Favorite = {
     artists: new Set(),
     albums: new Set(),
     tracks: new Set(),
@@ -28,7 +28,7 @@ export class FavoritesService {
     private prisma: PrismaService,
   ) {}
 
-  async addArtistToFavourites(id: string) {
+  async favAddArtist(id: string) {
     const artist = await this.prisma.artist.findFirst({ where: { id } });
     if (!artist) throw new UnprocessableEntityException();
 
@@ -36,51 +36,51 @@ export class FavoritesService {
     return { statusCode: 201, message: 'Added successfully' };
   }
 
-  removeArtistToFavourites(id: string) {
-    return FavoritesService.db.artists.delete(id);
+  favRemoveArtist(id: string) {
+    return FavoritesService.data.artists.delete(id);
   }
 
-  async addAlbumToFavourites(id: string) {
+  async favAddAlbum(id: string) {
     const album = await this.albumService.findOneAlbum(id);
 
     if (!album) throw new UnprocessableEntityException();
 
-    FavoritesService.db.albums.add(id);
+    FavoritesService.data.albums.add(id);
     return { statusCode: 201, message: 'Added successfully' };
   }
 
-  removeAlbumToFavourites(id: string) {
-    return FavoritesService.db.albums.delete(id);
+  favRemoveAlbum(id: string) {
+    return FavoritesService.data.albums.delete(id);
   }
 
-  async addTrackToFavourites(id: string) {
+  async favAddTrack(id: string) {
     const track = await this.trackService.findOneTrack(id);
 
     if (!track) throw new UnprocessableEntityException();
 
-    FavoritesService.db.tracks.add(id);
+    FavoritesService.data.tracks.add(id);
     return { statusCode: 201, message: 'Added successfully' };
   }
 
-  removeTrackToFavourites(id: string) {
-    return FavoritesService.db.tracks.delete(id);
+  favRemoveTrack(id: string) {
+    return FavoritesService.data.tracks.delete(id);
   }
 
-  async findAll() {
+  async FavfindServcies() {
     return {
-      artists: await Promise.all(
-        Array.from(FavoritesService.db.artists).map((artistId) =>
-          this.artistService.findOneArtist(artistId),
-        ),
-      ),
       albums: await Promise.all(
-        Array.from(FavoritesService.db.albums).map((albumId) =>
+        Array.from(FavoritesService.data.albums).map((albumId) =>
           this.albumService.findOneAlbum(albumId),
         ),
       ),
       tracks: await Promise.all(
-        Array.from(FavoritesService.db.tracks).map((trackId) =>
+        Array.from(FavoritesService.data.tracks).map((trackId) =>
           this.trackService.findOneTrack(trackId),
+        ),
+      ),
+      artists: await Promise.all(
+        Array.from(FavoritesService.data.artists).map((artistId) =>
+          this.artistService.findOneArtist(artistId),
         ),
       ),
     };

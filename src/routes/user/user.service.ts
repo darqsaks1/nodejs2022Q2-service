@@ -4,12 +4,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { plainToInstance } from 'class-transformer';
-import { FullyData } from '../../data/fullyData';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../prismaService/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
-
+import { HTTP_ANSWERS, HTTP_CODES } from 'src/utils';
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {
@@ -23,33 +22,30 @@ export class UserService {
   }
 
   async findAllUser() {
-    const users = await this.prisma.user.findMany();
-    return users.map((user) => plainToInstance(User, user));
+    const all = await this.prisma.user.findMany();
+    return all.map((user) => plainToInstance(User, user));
   }
 
   async findOneUser(id: string) {
-    const user = await this.prisma.user.findFirst({ where: { id } });
-
-    if (!user)
+    const finded = await this.prisma.user.findFirst({ where: { id } });
+    if (!finded)
       throw new NotFoundException({
-        statusCode: 404,
-        message: `User with this ID was not found`,
-        error: 'Not Found',
+        statusCode: HTTP_CODES.NOT_FOUND,
+        message: HTTP_ANSWERS.BAD_RESPONSE.USER.FIND.message,
+        error: HTTP_ANSWERS.BAD_RESPONSE.USER.FIND.error,
       });
 
-    return plainToInstance(User, user);
+    return plainToInstance(User, finded);
   }
 
   async updateUser(id: string, updateUserDto: UpdateUserDto) {
-    const user = await this.prisma.user.findFirst({ where: { id } });
-
-    if (updateUserDto.oldPassword !== user.password)
+    const finded = await this.prisma.user.findFirst({ where: { id } });
+    if (updateUserDto.oldPassword !== finded.password)
       throw new ForbiddenException({
-        statusCode: 403,
-        message: 'The wrong password was entered',
-        error: 'Forbidden',
+        statusCode: HTTP_CODES.FORBIDDEN,
+        message: HTTP_ANSWERS.BAD_RESPONSE.USER.UPDATE.message,
+        error: HTTP_ANSWERS.BAD_RESPONSE.USER.UPDATE.error,
       });
-
     return plainToInstance(
       User,
       await this.prisma.user.update({
