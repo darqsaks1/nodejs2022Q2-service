@@ -8,8 +8,10 @@ import {
   HttpException,
   HttpStatus,
   Put,
+  Req,
   ParseUUIDPipe,
   HttpCode,
+  Res
 } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 import { UserService } from './user.service';
@@ -22,9 +24,9 @@ export class UserController {
   constructor(private readonly userService: UserService) { }
   @ApiResponse({ status: 200, description: 'Server should answer with status code 200 and all users records' })
   @Get()
-  findAll() {
+  findAll(@Res() res, @Req() req) {
     return this.userService.findAllUser();
-  } 
+  }
   @ApiResponse({ status: 201, description: 'Server should answer with status code 201 and newly created record if request is valid' })
   @ApiResponse({ status: 400, description: 'Server should answer with status code 400 and corresponding message if request body does not contain required fields.' })
   @Post()

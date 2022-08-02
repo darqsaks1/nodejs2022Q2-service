@@ -1,7 +1,7 @@
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { SwaggerModule } from '@nestjs/swagger';
-import { readFile } from 'fs/promises';
 import { AppModule } from './app.module';
+import { readFile } from 'fs/promises';
 import { NestFactory, Reflector } from '@nestjs/core';
 import * as dotenv from 'dotenv';
 import { resolve } from 'path';

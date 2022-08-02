@@ -8,19 +8,31 @@ import {
   ParseUUIDPipe,
   HttpCode,
   Put,
+  Req,
+  UnauthorizedException
 } from '@nestjs/common';
 import { TrackService } from './track.service';
+import { Request } from 'express';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { ApiResponse } from '@nestjs/swagger';
-
+import { ApiBasicAuth, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+@ApiBasicAuth()
+@ApiBearerAuth()
 @Controller('track')
 export class TrackController {
   constructor(private readonly trackService: TrackService) { }
   @ApiResponse({ status: 200, description: 'Server should answer with status code 200 and all records' })
+  @ApiBearerAuth()
   @Get()
-  findAll() {
-    return this.trackService.findAllTrack();
+  async findAll(@Req() request: Request) {
+    console.log(request.headers.authorization)
+    console.log(`Bearer ${process.env.BAERER_TOKEN}`)
+    if (request.headers.authorization !== `Bearer ${process.env.BAERER_TOKEN}`) {
+      throw new UnauthorizedException()
+    }
+    else {
+      return this.trackService.findAllTrack();
+    }
   }
   @ApiResponse({ status: 200, description: 'Server should answer with status code 200 and and record with id === id if it exists' })
   @ApiResponse({ status: 400, description: 'Server should answer with status code 400 and corresponding message if userId is invalid (not uuid)' })
