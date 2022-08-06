@@ -10,12 +10,16 @@ import {
   ParseUUIDPipe,
   HttpCode,
   Put,
+  Req,
+  UnauthorizedException
 } from '@nestjs/common';
 import { ArtistService } from './artist.service';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { NOT_EXIST } from '../../utils/index';
 import { ApiResponse } from '@nestjs/swagger';
+import { Request } from 'express';
+
 
 @Controller('artist')
 export class ArtistController {
@@ -24,21 +28,42 @@ export class ArtistController {
   @ApiResponse({ status: 400, description: 'Server should answer with status code 400 and corresponding message if request body does not contain required fields.' })
   @Post()
   @HttpCode(201)
-  create(@Body() createArtistDto: CreateArtistDto) {
-    return this.artistService.createArtist(createArtistDto);
+  create(
+    @Body() createArtistDto: CreateArtistDto,
+    @Req() request: Request
+  ) {
+    if (request.headers.authorization !== `Bearer ${process.env.BAERER_TOKEN}`) {
+      throw new UnauthorizedException()
+    }
+    else {
+      return this.artistService.createArtist(createArtistDto);
+    }
   }
   @ApiResponse({ status: 200, description: 'Server should answer with status code 200 and all users records' })
 
   @Get()
-  findAll() {
-    return this.artistService.findAllArtist();
+  findAll(@Req() request: Request) {
+    if (request.headers.authorization !== `Bearer ${process.env.BAERER_TOKEN}`) {
+      throw new UnauthorizedException()
+    }
+    else {
+      return this.artistService.findAllArtist();
+    }
   }
   @ApiResponse({ status: 200, description: 'Server should answer with status code 200 and and record with id === userId if it exists' })
   @ApiResponse({ status: 400, description: 'Server should answer with status code 400 and corresponding message if userId is invalid (not uuid)' })
   @ApiResponse({ status: 404, description: 'Server should answer with status code 404 and corresponding message if record with id === userId doesnt exist' })
   @Get(':id')
-  async findOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    return this.artistService.findOneArtist(id);
+  async findOne(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Req() request: Request
+
+  ) {
+    if (request.headers.authorization !== `Bearer ${process.env.BAERER_TOKEN}`) {
+      throw new UnauthorizedException()
+    } else {
+      return this.artistService.findOneArtist(id);
+    }
   }
   @ApiResponse({ status: 201, description: 'Server should answer with status code 200 and updated record if request is valid' })
   @ApiResponse({ status: 400, description: 'Server should answer with status code 400 and corresponding message if userId is invalid(not uuid)' })
@@ -47,15 +72,21 @@ export class ArtistController {
   async update(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() updateArtistDto: UpdateArtistDto,
+    @Req() request: Request
   ) {
-    const artist = await this.findOne(id);
-    if (!artist) {
-      throw new HttpException(
-        NOT_EXIST,
-        HttpStatus.NOT_FOUND,
-      );
-    } else {
-      return this.artistService.updateArtist(id, updateArtistDto);
+    if (request.headers.authorization !== `Bearer ${process.env.BAERER_TOKEN}`) {
+      throw new UnauthorizedException()
+    }
+    else {
+      const artist = await this.findOne(id, request);
+      if (!artist) {
+        throw new HttpException(
+          NOT_EXIST,
+          HttpStatus.NOT_FOUND,
+        );
+      } else {
+        return this.artistService.updateArtist(id, updateArtistDto);
+      }
     }
   }
   @ApiResponse({ status: 204, description: 'Server should answer with status code 200 and updated record if request is valid' })
@@ -63,8 +94,16 @@ export class ArtistController {
   @ApiResponse({ status: 404, description: 'Server should answer with status code 404 and corresponding message if record with id === userId doesnt exist' })
   @Delete(':id')
   @HttpCode(204)
-  async remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    await this.findOne(id);
-    return this.artistService.removeArtist(id);
+  async remove(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Req() request: Request
+  ) {
+    if (request.headers.authorization !== `Bearer ${process.env.BAERER_TOKEN}`) {
+      throw new UnauthorizedException()
+    }
+    else {
+      await this.findOne(id, request);
+      return this.artistService.removeArtist(id);
+    }
   }
 }

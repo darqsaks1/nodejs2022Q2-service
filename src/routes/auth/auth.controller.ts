@@ -24,7 +24,7 @@ export class AuthController {
   ) { }
 
   @Post('signup')
-  @HttpCode(200)
+  @HttpCode(201)
   public async create(@Body() createUserDto: CreateUserDto) {
     return this.authService.signUp(createUserDto);
   }
@@ -41,43 +41,6 @@ export class AuthController {
         return this.authService.login(createUserDto);
       }
     }
-    // return this.authService.login(createUserDto);
   }
-  //     return {
-  //   id: user.id,
-  //   login: user.login,
-  //   version: user.version,
-  //   createdAt: new Date(user.createdAt).valueOf(),
-  //   updatedAt: new Date(user.updatedAt).valueOf(),
-  // };
-  //   }
 
-  // @Post('login')
-  // @HttpCode(HttpStatus.OK)
-  // async loginUser(
-  //     @Body(new ValidationPipe()) createUsers: CreateUserDto,
-  //   ): Promise < ITokens > {
-  //   const user: IUser = await this.usersService.getUserByLogin(
-  //     createUsers.login,
-  //   );
-
-  //   if(!user) {
-  //     throw new HttpException(
-  //       EXCEPTION.BAD_REQUEST.NOT_FOUND,
-  //       HttpStatus.NOT_FOUND,
-  //     );
-  //   }
-
-  //     if(!(await comparePassword(createUsers.password, user.password))) {
-  //   throw new HttpException(
-  //     EXCEPTION.FORBIDDEN.BAD_PASSWORD,
-  //     HttpStatus.FORBIDDEN,
-  //   );
-  // }
-
-  // return this.authService.generateTokens({
-  //   id: user.id,
-  //   login: user.login,
-  // });
-  //   }
 }

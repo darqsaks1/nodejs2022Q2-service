@@ -25,8 +25,7 @@ export class TrackController {
   @ApiBearerAuth()
   @Get()
   async findAll(@Req() request: Request) {
-    console.log(request.headers.authorization)
-    console.log(`Bearer ${process.env.BAERER_TOKEN}`)
+
     if (request.headers.authorization !== `Bearer ${process.env.BAERER_TOKEN}`) {
       throw new UnauthorizedException()
     }
@@ -38,15 +37,31 @@ export class TrackController {
   @ApiResponse({ status: 400, description: 'Server should answer with status code 400 and corresponding message if userId is invalid (not uuid)' })
   @ApiResponse({ status: 404, description: 'Server should answer with status code 404 and corresponding message if record with id === id doesnt exist' })
   @Get(':id')
-  async findOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    return this.trackService.findOneTrack(id);
+  async findOne(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Req() request: Request
+  ) {
+    if (request.headers.authorization !== `Bearer ${process.env.BAERER_TOKEN}`) {
+      throw new UnauthorizedException()
+    }
+    else {
+      return this.trackService.findOneTrack(id);
+    }
   }
   @ApiResponse({ status: 201, description: 'Server should answer with status code 201 and newly created record if request is valid' })
   @ApiResponse({ status: 400, description: 'Server should answer with status code 400 and corresponding message if request body does not contain required fields.' })
   @Post()
   @HttpCode(201)
-  create(@Body() createTrackDto: CreateTrackDto) {
-    return this.trackService.createTrack(createTrackDto);
+  create(
+    @Body() createTrackDto: CreateTrackDto,
+    @Req() request: Request
+  ) {
+    if (request.headers.authorization !== `Bearer ${process.env.BAERER_TOKEN}`) {
+      throw new UnauthorizedException()
+    }
+    else {
+      return this.trackService.createTrack(createTrackDto);
+    }
   }
   @ApiResponse({ status: 201, description: 'Server should answer with status code 200 and updated record if request is valid' })
   @ApiResponse({ status: 400, description: 'Server should answer with status code 400 and corresponding message if  is invalid(not uuid)' })
@@ -55,17 +70,32 @@ export class TrackController {
   async update(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() updateTrackDto: UpdateTrackDto,
+    @Req() request: Request
   ) {
-    await this.findOne(id);
-    return this.trackService.updateTrack(id, updateTrackDto);
+    if (request.headers.authorization !== `Bearer ${process.env.BAERER_TOKEN}`) {
+      throw new UnauthorizedException()
+    }
+    else {
+      await this.findOne(id, request);
+      return this.trackService.updateTrack(id, updateTrackDto);
+    }
   }
   @ApiResponse({ status: 204, description: 'Server should answer with status code 200 and updated record if request is valid' })
   @ApiResponse({ status: 400, description: 'Server should answer with status code 400 and corresponding message if  is invalid(not uuid)' })
   @ApiResponse({ status: 404, description: 'Server should answer with status code 404 and corresponding message if record with id === id doesnt exist' })
   @Delete(':id')
   @HttpCode(204)
-  async remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
-    await this.findOne(id);
-    return this.trackService.removeTrack(id);
+  async remove(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Req() request: Request
+  ) {
+    if (request.headers.authorization !== `Bearer ${process.env.BAERER_TOKEN}`) {
+      throw new UnauthorizedException()
+    }
+    else {
+      await this.findOne(id, request);
+      return this.trackService.removeTrack(id);
+    }
+
   }
 }

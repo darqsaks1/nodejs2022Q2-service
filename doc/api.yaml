@@ -189,6 +189,27 @@ paths:
           description: Server should answer with status code 201 and corresponding message if dto is valid
         400:
           description: Server should answer with status code 400 and corresponding message if dto is invalid (no login or password, or they are not a strings
+  /auth/refresh:
+    post:
+      tags:
+        - Refresh
+      security: []
+      summary: Refresh
+      description: Refresh a token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+              title: example
+      responses:
+        200:
+          description: Server should answer with status code 200 and tokens in body if dto is valid
+        201:
+          description:  Server should answer with status code 401 and corresponding message if dto is invalid (no refreshToken in body)
+        400:
+          description: Server should answer with status code 403 and corresponding message if authentication failed (Refresh token is invalid or expired)
   /user:
     get:
       security:

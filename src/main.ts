@@ -20,7 +20,7 @@ async function start() {
     .useGlobalPipes(
       new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
     );
-  SwaggerModule.setup('doc', app, parse(APP_DOC));
+  SwaggerModule.setup('doc', app, parse(APP_DOC))
   await app.listen(PORT_ENV);
 }
 start();
