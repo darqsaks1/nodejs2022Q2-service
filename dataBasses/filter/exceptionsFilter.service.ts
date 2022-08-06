@@ -14,6 +14,26 @@ import { HTTPRESP } from '../../src/ts/sharedTypes';
 
 @Catch()
 export class LoggerFiler implements ExceptionFilter {
+
+  private errors = (
+    status: HttpStatus,
+    errorMessage: string,
+    request: Request,
+  ) => ({
+    statusCode: status,
+    error: errorMessage,
+    path: request.url,
+    method: request.method,
+    timeStamp: new Date(),
+  });
+
+  private logs = (
+    errorResponse: HTTPRESP,
+    request: Request,
+    exception: unknown,
+  ): string => {
+    return getLogger(errorResponse, request, exception);
+  };
   private readonly logger: Logger = new Logger(LoggerFiler.name);
   private writeErrorLogToFile = (errorLog: string): void => {
     writeLog(errorLog);
@@ -41,25 +61,6 @@ export class LoggerFiler implements ExceptionFilter {
     response.status(status).json(errorResponse);
   }
 
-  private errors = (
-    status: HttpStatus,
-    errorMessage: string,
-    request: Request,
-  ) => ({
-    statusCode: status,
-    error: errorMessage,
-    path: request.url,
-    method: request.method,
-    timeStamp: new Date(),
-  });
-
-  private logs = (
-    errorResponse: HTTPRESP,
-    request: Request,
-    exception: unknown,
-  ): string => {
-    return getLogger(errorResponse, request, exception);
-  };
 
 
 }
