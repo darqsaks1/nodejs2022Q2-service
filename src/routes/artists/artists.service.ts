@@ -6,8 +6,6 @@ const prisma = new PrismaClient();
 
 @Injectable()
 export class ArtistsService {
-  
-
   async changeArtist(
     id: IArtist['id'],
     data: {
@@ -48,7 +46,7 @@ export class ArtistsService {
       },
     });
   }
-  
+
   async deleteArtist(id: IArtist['id']): Promise<void> {
     await prisma.artist.delete({
       where: {

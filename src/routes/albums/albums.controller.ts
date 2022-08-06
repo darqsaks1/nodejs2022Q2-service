@@ -103,16 +103,6 @@ export class AlbumsController {
   async getAllAlbums(): Promise<IAlbum[]> {
     return await this.albumsService.getAllAlbums();
   }
-
-  @Post()
-  @HttpCode(HttpStatus.CREATED)
-  @UseGuards(AuthSettings)
-  async createAlbum(
-    @Body(new ValidationPipe()) createAlbum: CreateAlbumDto,
-  ): Promise<IAlbum> {
-    return await this.albumsService.createAlbum(createAlbum);
-  }
-
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(AuthSettings)
@@ -136,5 +126,13 @@ export class AlbumsController {
     } else {
       await this.albumsService.deleteAlbum(id);
     }
+  }
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  @UseGuards(AuthSettings)
+  async createAlbum(
+    @Body(new ValidationPipe()) createAlbum: CreateAlbumDto,
+  ): Promise<IAlbum> {
+    return await this.albumsService.createAlbum(createAlbum);
   }
 }

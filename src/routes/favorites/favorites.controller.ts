@@ -31,14 +31,9 @@ export class FavsContrl {
     private readonly trackService: TracksService,
     private readonly albumsService: AlbumsService,
     private readonly artistsService: ArtistsService,
-  ) {}
+  ) { }
 
-  @Get()
-  @HttpCode(HttpStatus.OK)
-  @UseGuards(AuthSettings)
-  async getAllFavorites(): Promise<IFavoritesResponse[]> {
-    return await this.favServ.getAllFavorites();
-  }
+
 
   @Post('track/:id')
   @HttpCode(HttpStatus.CREATED)
@@ -138,6 +133,12 @@ export class FavsContrl {
     }
 
     await this.favServ.deleteFavoriteAlbum(id);
+  }
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthSettings)
+  async getAllFavorites(): Promise<IFavoritesResponse[]> {
+    return await this.favServ.getAllFavorites();
   }
 
   @Post('artist/:id')

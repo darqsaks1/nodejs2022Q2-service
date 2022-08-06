@@ -37,7 +37,26 @@ export class ArtistsController {
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthSettings)
+  async getArtistById(@Param('id') id: IArtist['id']): Promise<IArtist> {
+    if (!valitadeId(id)) {
+      this.logger.warn(ANSWERS.BAD_REQUEST.BAD_UUID);
+      throw new HttpException(
+        ANSWERS.BAD_REQUEST.BAD_UUID,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const artist: IArtist = await this.artistService.getArtistById(id);
 
+    if (!artist) {
+      this.logger.warn(ANSWERS.BAD_REQUEST.NOT_FOUND);
+      throw new HttpException(
+        ANSWERS.BAD_REQUEST.NOT_FOUND,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return artist;
+  }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -75,26 +94,7 @@ export class ArtistsController {
 
     return this.artistService.changeArtist(id, changeArtis);
   }
-  async getArtistById(@Param('id') id: IArtist['id']): Promise<IArtist> {
-    if (!valitadeId(id)) {
-      this.logger.warn(ANSWERS.BAD_REQUEST.BAD_UUID);
-      throw new HttpException(
-        ANSWERS.BAD_REQUEST.BAD_UUID,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    const artist: IArtist = await this.artistService.getArtistById(id);
 
-    if (!artist) {
-      this.logger.warn(ANSWERS.BAD_REQUEST.NOT_FOUND);
-      throw new HttpException(
-        ANSWERS.BAD_REQUEST.NOT_FOUND,
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    return artist;
-  }
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(AuthSettings)

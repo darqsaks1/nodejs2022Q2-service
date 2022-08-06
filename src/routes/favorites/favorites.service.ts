@@ -30,24 +30,7 @@ export class FavoService {
     return getRes(favorites);
   }
 
-  async addNewFavTrack(track: ITrack): Promise<ITrack> {
-    const favorites = await prisma.favorite.findMany();
-
-    if (!favorites.length) {
-      const newFavorites = await prisma.favorite.create({ data: {} });
-      await prisma.track.update({
-        where: { id: track.id },
-        data: { favoriteId: newFavorites.id },
-      });
-    } else {
-      await prisma.track.update({
-        where: { id: track.id },
-        data: { favoriteId: favorites[0].id },
-      });
-    }
-
-    return track;
-  }
+  
 
   async deleteNewFavTrack(id: ITrack['id']): Promise<void> {
     await prisma.track.update({
@@ -74,7 +57,24 @@ export class FavoService {
 
     return artist;
   }
+  async addNewFavTrack(track: ITrack): Promise<ITrack> {
+    const favorites = await prisma.favorite.findMany();
 
+    if (!favorites.length) {
+      const newFavorites = await prisma.favorite.create({ data: {} });
+      await prisma.track.update({
+        where: { id: track.id },
+        data: { favoriteId: newFavorites.id },
+      });
+    } else {
+      await prisma.track.update({
+        where: { id: track.id },
+        data: { favoriteId: favorites[0].id },
+      });
+    }
+
+    return track;
+  }
   async createFavoritesAlbum(album: IAlbum): Promise<IAlbum> {
     const favorites = await prisma.favorite.findMany();
 
