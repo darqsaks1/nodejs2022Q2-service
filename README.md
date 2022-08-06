@@ -1,8 +1,8 @@
 # Home Library Service
 
-## Docker Compose
 
-- Docker hub image - <a href="https://hub.docker.com/repository/docker/shaht3r/nodejs2022q2" target="_blank">nodejs2022q2</a>
+## POSTGRESS PORT BY DEFAULT - 5432
+
 
 ## Run application docker
 `docker compose up -V --build`
