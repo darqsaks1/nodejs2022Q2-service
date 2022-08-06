@@ -1,26 +1,48 @@
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { UserModule } from './routes/user/user.module';
-import { PrismaModule } from './prismaService/prisma.module';
-import { TrackModule } from './routes/track/track.module';
-import { AuthModule } from './routes/auth/auth.module';
-import { ArtistModule } from './routes/artist/artist.module';
-import { AlbumModule } from './routes/album/album.module';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { APP_FILTER } from '@nestjs/core';
+import { UsersModule } from './routes/users/users.module';
+import { TracksModule } from './routes/tracks/tracks.module';
+import { ArtistsModule } from './routes/artists/artists.module';
+import { LoggerMiddleware } from '../dataBasses/middleware/logger.middleware';
+import { UsersController } from './routes/users/users.controller';
+import { TracksController } from './routes/tracks/tracks.controller';
+import { AlbumsController } from './routes/albums/albums.controller';
+import { ArtistsController } from './routes/artists/artists.controller';
+import { FavsContrl } from './routes/favorites/favorites.controller';
+import { LoggerFiler } from '../dataBasses/filter/exceptionsFilter.service';
+import { AlbumsModule } from './routes/albums/albums.module';
 import { FavoritesModule } from './routes/favorites/favorites.module';
-// import { SignupModule } from './routes/auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
+import { AuthModule } from './routes/auth/auth.module';
+
 
 @Module({
   imports: [
-    UserModule,
-    PrismaModule,
-    AuthModule,
-    ArtistModule,
-    AlbumModule,
-    TrackModule,
+    TracksModule,
+    ArtistsModule,
+    AlbumsModule,
+    UsersModule,
     FavoritesModule,
+    AuthModule,
+    ConfigModule.forRoot(),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: LoggerFiler,
+    },
+  ],
 })
-export class AppModule { }
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LoggerMiddleware)
+      .forRoutes(
+        AlbumsController,
+        ArtistsController,
+        FavsContrl,
+        TracksController,
+        UsersController,
+      );
+  }
+}

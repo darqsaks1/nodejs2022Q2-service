@@ -1,60 +1,43 @@
 import { Injectable } from '@nestjs/common';
+import { IUser } from '../../ts/users.interface';
 import * as jwt from 'jsonwebtoken';
 import { PrismaClient, User } from '@prisma/client';
-
 import { v4 as uuidv4 } from 'uuid';
-import * as bcrypt from 'bcrypt'
-import { ITokens } from './auth.interface';
-import { InMemoryStore } from '../../data/auth';
+import { getHash } from '../../../helpers';
+import { FIRST_VERSION } from '../../ts/answers';
+import { ITokens } from '../../ts/auth.interface';
 
+const prisma = new PrismaClient();
 
 @Injectable()
 export class AuthService {
-  constructor(private inMemoryStore: InMemoryStore) { }
-
-  async signUp(obj) {
-    const user = {
-      id: uuidv4(),
-      login: obj.login,
-      password: bcrypt.hashSync(obj?.password, 10)
-    }
-    this.inMemoryStore.authUsers.push(user)
-    return user
+  async authUser(user: {
+    login: IUser['login'];
+    password: IUser['password'];
+  }): Promise<User> {
+    return await prisma.user.create({
+      data: {
+        id: uuidv4(),
+        login: user.login,
+        password: await getHash(user.password),
+        version: FIRST_VERSION,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      },
+    });
   }
-  async login(obj) {
-    console.log('work', obj)
-    const accessToken = jwt.sign(obj, process.env.JWT_SECRET_KEY, {
+
+  createToken(payload): ITokens {
+    const accessToken = jwt.sign(payload, process.env.JWT_SECRET_KEY, {
       expiresIn: process.env.TOKEN_EXPIRE_TIME,
     });
-    process.env.BAERER_TOKEN = accessToken
-    const finded = this.inMemoryStore.authUsers.find(user => user.login === obj.login)
+    const refreshToken = jwt.sign(payload, process.env.JWT_SECRET_REFRESH_KEY, {
+      expiresIn: process.env.TOKEN_REFRESH_EXPIRE_TIME,
+    });
 
-    console.log(accessToken)
-    const payload = {
-      login: finded.login,
-      userId: finded.id,
-      BAERER_TOKEN: process.env.BAERER_TOKEN,
-      TOKEN_EXPIRE_TIME: process.env.TOKEN_EXPIRE_TIME
-    }
-    // const user = {
-    //   id: uuidv4(),
-    //   login: obj.login,
-    //   password: bcrypt.hashSync(obj?.password, 10)
-    // }
-    // this.inMemoryStore.authUsers.push(user)
-    return payload
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
-  // generateTokens(payload): ITokens {
-  //   const accessToken = jwt.sign(payload, process.env.JWT_SECRET_KEY, {
-  //     expiresIn: process.env.TOKEN_EXPIRE_TIME,
-  //   });
-  //   const refreshToken = jwt.sign(payload, process.env.JWT_SECRET_REFRESH_KEY, {
-  //     expiresIn: process.env.TOKEN_REFRESH_EXPIRE_TIME,
-  //   });
-
-  //   return {
-  //     accessToken,
-  //     refreshToken,
-  //   };
-  // }
 }

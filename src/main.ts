@@ -1,26 +1,27 @@
-import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
 import { SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
 import { readFile } from 'fs/promises';
-import { NestFactory, Reflector } from '@nestjs/core';
-import * as dotenv from 'dotenv';
-import { resolve } from 'path';
-import { cwd } from 'process';
 import { parse } from 'yaml';
+import { join } from 'path';
+import { FullyLogger } from '../dataBasses/service/loggerService.service';
+import { waitingExp, addLogger } from '../helpers';
 
-async function start() {
-  dotenv.config({ path: resolve(cwd(), '.env') });
-  const PORT_ENV = process.env.PORT || 4000;
-  const APP_DOC = await readFile(resolve(cwd(), 'doc', 'api.yaml'), {
-    encoding: 'utf8',
+
+async function init() {
+  const app = await NestFactory.create(AppModule, {
+    logger: new FullyLogger(addLogger()),
   });
-  const app = await NestFactory.create(AppModule);
-  app
-    .useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)))
-    .useGlobalPipes(
-      new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
-    );
-  SwaggerModule.setup('doc', app, parse(APP_DOC))
-  await app.listen(PORT_ENV);
+  const PORT: string | number = process.env.PORT || 4000;
+  app.useGlobalPipes(
+    new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
+  );
+  waitingExp();
+  const DOC_API = await readFile(join(process.cwd(), 'doc', 'api.yaml'), 'utf-8');
+  const document = parse(DOC_API);
+  SwaggerModule.setup('doc', app, document);
+  await app.listen(PORT);
 }
-start();
+
+init().then(() => console.log('http://localhost:4000/doc#/Users/get_user'));

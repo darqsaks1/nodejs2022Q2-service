@@ -1,110 +1,194 @@
 import {
   Controller,
-  Get,
-  Post,
-  Param,
   Delete,
-  ParseUUIDPipe,
+  Get,
   HttpCode,
-  Req,
-  UnauthorizedException
+  HttpException,
+  HttpStatus,
+  Logger,
+  Param,
+  Post,
+  UseGuards,
 } from '@nestjs/common';
-import { Request } from 'express';
-
-import { FavoritesService } from './favorites.service';
+import { IFavoritesResponse } from '../../ts/favorites.interface';
+import { FavoService } from './favorites.service';
+import { ITrack } from '../../ts/tracks.interface';
+import { TracksService } from '../tracks/tracks.service';
+import { AlbumsService } from '../albums/albums.service';
+import { ArtistsService } from '../artists/artists.service';
+import { IAlbum } from '../../ts/albums.interface';
+import { IArtist } from '../../ts/artists.interface';
+import { valitadeId } from '../../../helpers';
+import { ANSWERS } from '../../ts/answers';
+import { AuthSettings } from '../auth/dto/auth.guard';
 
 @Controller('favs')
-export class FavoritesController {
-  constructor(private readonly favoritesService: FavoritesService) { }
+export class FavsContrl {
+  private readonly logger: Logger = new Logger(FavsContrl.name);
+
+  constructor(
+    private readonly favServ: FavoService,
+    private readonly trackService: TracksService,
+    private readonly albumsService: AlbumsService,
+    private readonly artistsService: ArtistsService,
+  ) {}
+
   @Get()
-  findAll(@Req() request: Request) {
-    if (request.headers.authorization !== `Bearer ${process.env.BAERER_TOKEN}`) {
-      throw new UnauthorizedException()
-    }
-    return this.favoritesService.FavfindServcies();
-  }
-
-  @Post('album/:id')
-  @HttpCode(201)
-  addAlbumToFavourites(
-    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
-    @Req() request: Request
-  ) {
-    if (request.headers.authorization !== `Bearer ${process.env.BAERER_TOKEN}`) {
-      throw new UnauthorizedException()
-    }
-    else {
-      return this.favoritesService.favAddAlbum(id);
-    }
-  }
-
-  @Delete('album/:id')
-  @HttpCode(204)
-  removeAlbumToFavourites(
-    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
-    @Req() request: Request
-  ) {
-    if (request.headers.authorization !== `Bearer ${process.env.BAERER_TOKEN}`) {
-      throw new UnauthorizedException()
-    } else {
-      return this.favoritesService.favRemove(id, 'albums');
-    }
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthSettings)
+  async getAllFavorites(): Promise<IFavoritesResponse[]> {
+    return await this.favServ.getAllFavorites();
   }
 
   @Post('track/:id')
-  @HttpCode(201)
-  addTrackToFavourites(
-    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
-    @Req() request: Request
-  ) {
-    if (request.headers.authorization !== `Bearer ${process.env.BAERER_TOKEN}`) {
-      throw new UnauthorizedException()
+  @HttpCode(HttpStatus.CREATED)
+  @UseGuards(AuthSettings)
+  async addNewFavTrack(@Param('id') id: ITrack['id']): Promise<ITrack> {
+    if (!valitadeId(id)) {
+      this.logger.warn(ANSWERS.BAD_REQUEST.BAD_UUID);
+      throw new HttpException(
+        ANSWERS.BAD_REQUEST.BAD_UUID,
+        HttpStatus.BAD_REQUEST,
+      );
     }
-    else {
-      return this.favoritesService.favAddTrack(id);
+
+    const track: ITrack = await this.trackService.getTrackById(id);
+
+    if (!track) {
+      this.logger.warn(ANSWERS.UNPROCESSABLE_ENTITY.NOT_FOUND);
+      throw new HttpException(
+        ANSWERS.UNPROCESSABLE_ENTITY.NOT_FOUND,
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
     }
+
+    return this.favServ.addNewFavTrack(track);
   }
 
   @Delete('track/:id')
-  @HttpCode(204)
-  removeTrackToFavourites(
-    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
-    @Req() request: Request
-  ) {
-    if (request.headers.authorization !== `Bearer ${process.env.BAERER_TOKEN}`) {
-      throw new UnauthorizedException()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(AuthSettings)
+  async deleteNewFavTrack(@Param('id') id: ITrack['id']): Promise<void> {
+    if (!valitadeId(id)) {
+      this.logger.warn(ANSWERS.BAD_REQUEST.BAD_UUID);
+      throw new HttpException(
+        ANSWERS.BAD_REQUEST.BAD_UUID,
+        HttpStatus.BAD_REQUEST,
+      );
     }
-    else {
-      return this.favoritesService.favRemove(id, 'tracks');
-    }
-  }
-  @Post('artist/:id')
-  @HttpCode(201)
-  addArtistToFavourites(
-    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
-    @Req() request: Request
 
-  ) {
-    if (request.headers.authorization !== `Bearer ${process.env.BAERER_TOKEN}`) {
-      throw new UnauthorizedException()
+    const track: ITrack = await this.trackService.getTrackById(id);
+
+    if (!track) {
+      this.logger.warn(ANSWERS.BAD_REQUEST.NOT_FOUND);
+      throw new HttpException(
+        ANSWERS.BAD_REQUEST.NOT_FOUND,
+        HttpStatus.NOT_FOUND,
+      );
     }
-    else {
-      return this.favoritesService.favAddArtist(id);
+
+    await this.favServ.deleteNewFavTrack(id);
+  }
+
+  @Post('album/:id')
+  @HttpCode(HttpStatus.CREATED)
+  @UseGuards(AuthSettings)
+  async createFavoritesAlbum(@Param('id') id: IAlbum['id']): Promise<IAlbum> {
+    if (!valitadeId(id)) {
+      this.logger.warn(ANSWERS.BAD_REQUEST.BAD_UUID);
+      throw new HttpException(
+        ANSWERS.BAD_REQUEST.BAD_UUID,
+        HttpStatus.BAD_REQUEST,
+      );
     }
+
+    const album: IAlbum = await this.albumsService.getAlbumById(id);
+
+    if (!album) {
+      this.logger.warn(ANSWERS.UNPROCESSABLE_ENTITY.NOT_FOUND);
+      throw new HttpException(
+        ANSWERS.UNPROCESSABLE_ENTITY.NOT_FOUND,
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+    }
+
+    return this.favServ.createFavoritesAlbum(album);
+  }
+
+  @Delete('album/:id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(AuthSettings)
+  async deleteFavoritesAlbum(@Param('id') id: IAlbum['id']): Promise<void> {
+    if (!valitadeId(id)) {
+      this.logger.warn(ANSWERS.BAD_REQUEST.BAD_UUID);
+      throw new HttpException(
+        ANSWERS.BAD_REQUEST.BAD_UUID,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const album: IAlbum = await this.albumsService.getAlbumById(id);
+
+    if (!album) {
+      this.logger.warn(ANSWERS.BAD_REQUEST.NOT_FOUND);
+      throw new HttpException(
+        ANSWERS.BAD_REQUEST.NOT_FOUND,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    await this.favServ.deleteFavoriteAlbum(id);
+  }
+
+  @Post('artist/:id')
+  @HttpCode(HttpStatus.CREATED)
+  @UseGuards(AuthSettings)
+  async createFavArt(
+    @Param('id') id: IArtist['id'],
+  ): Promise<IArtist> {
+    if (!valitadeId(id)) {
+      this.logger.warn(ANSWERS.BAD_REQUEST.BAD_UUID);
+      throw new HttpException(
+        ANSWERS.BAD_REQUEST.BAD_UUID,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const artist: IArtist = await this.artistsService.getArtistById(id);
+
+    if (!artist) {
+      this.logger.warn(ANSWERS.UNPROCESSABLE_ENTITY.NOT_FOUND);
+      throw new HttpException(
+        ANSWERS.UNPROCESSABLE_ENTITY.NOT_FOUND,
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+    }
+
+    return this.favServ.createFavArt(artist);
   }
 
   @Delete('artist/:id')
-  @HttpCode(204)
-  removeArtistToFavourites(
-    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
-    @Req() request: Request
-
-  ) {
-    if (request.headers.authorization !== `Bearer ${process.env.BAERER_TOKEN}`) {
-      throw new UnauthorizedException()
-    } else {
-      return this.favoritesService.favRemove(id, 'artists');
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(AuthSettings)
+  async deleteFavoritesArtist(@Param('id') id: IArtist['id']): Promise<void> {
+    if (!valitadeId(id)) {
+      this.logger.warn(ANSWERS.BAD_REQUEST.BAD_UUID);
+      throw new HttpException(
+        ANSWERS.BAD_REQUEST.BAD_UUID,
+        HttpStatus.BAD_REQUEST,
+      );
     }
-  }
 
+    const artist: IArtist = await this.artistsService.getArtistById(id);
+
+    if (!artist) {
+      this.logger.warn(ANSWERS.BAD_REQUEST.NOT_FOUND);
+      throw new HttpException(
+        ANSWERS.BAD_REQUEST.NOT_FOUND,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    await this.favServ.deleteFavoriteArtist(id);
+  }
 }
