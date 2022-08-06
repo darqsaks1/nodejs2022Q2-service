@@ -6,13 +6,6 @@ import * as fs from 'fs';
 import { HTTPRESP, Logs } from '../src/ts/sharedTypes';
 import e from 'express';
 
-export const comparePassword = async (
-  password,
-  oldPassword,
-): Promise<boolean> => {
-  return await bcrypt.compare(password, oldPassword);
-};
-
 export const getRes = (favorites) => {
   return {
     artists:
@@ -30,6 +23,14 @@ export const getRes = (favorites) => {
   };
 };
 
+export const comparePassword = async (
+  password,
+  oldPassword,
+): Promise<boolean> => {
+  return await bcrypt.compare(password, oldPassword);
+};
+
+
 export const getLogger = (
   errorResponse: HTTPRESP,
   request: e.Request,
@@ -44,31 +45,31 @@ export const getLogger = (
 };
 
 export const writeLog = (errorLog: string): void => {
-  const logsFolder: string = process.env.LOGS_FOLDER;
-  const logFileSize = Number(process.env.LOG_FILE_SIZE);
+  const fold: string = process.env.LOGS_FOLDER;
+  const size = Number(process.env.LOG_FILE_SIZE);
 
-  fs.readdir(logsFolder, (err: NodeJS.ErrnoException, files: string[]) => {
+  fs.readdir(fold, (err: NodeJS.ErrnoException, files: string[]) => {
     if (err) {
-      const fullPath: string = createNewLogsPath(logsFolder);
-      createFolder(logsFolder);
+      const fullPath: string = createNewLogsPath(fold);
+      createFolder(fold);
       writeLogInFile(fullPath, errorLog);
     }
     (files || []).forEach((file: string) => {
-      const fileSize: number = logSize(`${logsFolder}/${file}`);
+      const fileSize: number = logSize(`${fold}/${file}`);
 
-      if (fileSize < logFileSize) {
-        writeLogInFile(`${logsFolder}/${file}`, errorLog);
+      if (fileSize < size) {
+        writeLogInFile(`${fold}/${file}`, errorLog);
       } else {
-        const fullPath: string = createNewLogsPath(logsFolder);
+        const fullPath: string = createNewLogsPath(fold);
         writeLogInFile(fullPath, errorLog);
       }
     });
   });
 };
 
-export const createNewLogsPath = (logsFolder: string): string => {
+export const createNewLogsPath = (fold: string): string => {
   const logFileName: number = new Date().valueOf();
-  return `${logsFolder}/${logFileName}.log`;
+  return `${fold}/${logFileName}.log`;
 };
 
 export const writeLogInFile = (logName: string, errorLog: string) => {
@@ -85,8 +86,8 @@ export const getHash = async (password: string): Promise<string> => {
   return await bcrypt.hash(password, HASH_LEVEL);
 };
 
-export const createFolder = (logsFolder: string): void => {
-  fs.mkdir(logsFolder, { recursive: true }, (err: NodeJS.ErrnoException) => {
+export const createFolder = (fold: string): void => {
+  fs.mkdir(fold, { recursive: true }, (err: NodeJS.ErrnoException) => {
     if (err) throw err;
   });
 };
